@@ -13,7 +13,7 @@ $(document).ready(function () {
         let parsedCode_sym = SymbolicSubstitute(parsedCode);
         // $('#function_input').val(esco.generate(parsedCode_sym));
         let colored_code = EvalStatements(parsedCode_sym,inputVector);
-        document.write(colored_code);
+        $('#output').html(colored_code);
 
     });
 });

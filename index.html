@@ -26,6 +26,7 @@
             height: 75%;
         }
     </style>
+    <title></title>
 </head>
 <body>
 <table align="center">
@@ -57,16 +58,22 @@
 
         <td>
             <div class="textAreaWrapper">
-                <textarea id="codePlaceholder" title="Enter code here" ></textarea>
+                <label for="codePlaceholder"></label><textarea id="codePlaceholder" title="Enter code here" ></textarea>
             </div>
         </td>
 
         <td>
             <div class="textAreaWrapper">
-                <textarea id="function_input" title="Enter function's input here"  ></textarea>
+                <label for="function_input"></label><textarea id="function_input" title="Enter function's input here"  ></textarea>
             </div>
         </td>
 
+    </tr>
+
+    <tr>
+        <td>
+            <div id = "output"></div>
+        </td>
     </tr>
 
 
@@ -97,6 +104,7 @@
             </div>
         </td>
     </tr>
+
 
 </table>
 <script src="dist/bundle.js"></script>

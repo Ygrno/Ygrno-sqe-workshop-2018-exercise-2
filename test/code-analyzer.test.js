@@ -341,6 +341,57 @@ function Test26(){
     });
 }
 
+function Test27(){
+    it('Test 27', () => {
+        let codeToParse = 'function A(x){\n' +
+            'let b = x + 1;\n' +
+            'let c = b * b + 2;\n' +
+            '\n' +
+            'while(b > 1){\n' +
+            'if(c > b) return x;\n' +
+            '\n' +
+            '}\n' +
+            '\n' +
+            '}';
+        let parsedCode = parseCode_line(codeToParse);
+        let html_string = EvalStatements(SymbolicSubstitute(parsedCode),'0');
+        assert.equal(html_string,'<pre>function A(x) {\n    while (x + 1 > 1) {\n        if ((x + 1) * (x + 1) + 2 > x + 1)\n            return x;\n    }\n}\n</pre>');
+    });
+}
+
+function Test28(){
+    it('Test 28', () => {
+        let codeToParse = 'function A(x,y){\n' +
+            'let a;\n' +
+            '\n' +
+            'if(x > y) y = x;\n' +
+            'else if (x < y) x = y;\n' +
+            '\n' +
+            '}';
+        let parsedCode = parseCode_line(codeToParse);
+        let html_string = EvalStatements(SymbolicSubstitute(parsedCode),'1,2');
+        assert.equal(html_string,'<pre>function A(x, y) {\n<span style="background-color: #ff000e">    if (x > y)</span>\n        y = x;\n<span style="background-color: #37ff00">    else if (x < y)</span>\n        x = y;\n}\n</pre>');
+    });
+}
+
+function Test29(){
+    it('Test 29', () => {
+        let codeToParse = 'let b;\n' +
+            'function A(x,y){\n' +
+            'let a;\n' +
+            '\n' +
+            'if(x > y) y = x;\n' +
+            'else if (x < y) x = y;\n' +
+            '\n' +
+            '}';
+        let parsedCode = parseCode_line(codeToParse);
+        let html_string = EvalStatements(SymbolicSubstitute(parsedCode),'1,2');
+        assert.equal(html_string,'<pre>function A(x, y) {\n<span style="background-color: #ff000e">    if (x > y)</span>\n        y = x;\n<span style="background-color: #37ff00">    else if (x < y)</span>\n        x = y;\n}\n</pre>');
+    });
+}
+
+
+
 
 
 describe('The javascript parser', () => {
@@ -382,4 +433,7 @@ describe('Colored Html Code', ()=> {
     Test24();
     Test25();
     Test26();
+    Test27();
+    Test28();
+    Test29();
 });

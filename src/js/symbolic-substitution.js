@@ -205,8 +205,7 @@ function ENV_State_handler(state) {
         Builder(state[i], arr, 5);
         if(arr[0]['type'] === 'variable declaration' || arr[0]['type'] === 'assignment expression') {
             let value_string;
-            if(arr[0]['value'] != null) value_string = arr[0]['value'].split('(').join(' ( ').split(')').join(' ) ');
-            value_string = 'null';
+            value_string = arr[0]['value'].split('(').join(' ( ').split(')').join(' ) ');
             let value_sub = MakeSubstitution(value_string,env_global);
             env_setValue(arr[0]['name'], value_sub,env_global,'global');
         }
