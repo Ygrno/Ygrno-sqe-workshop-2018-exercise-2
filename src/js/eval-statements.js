@@ -43,6 +43,11 @@ function CreateParamTable(subbed_func,input_vector){
     for(let j = 0; j<parameters.length; j++) ParamTable.push(new Variable_table(esco.generate(parameters[j]),split_by_comma[j],'parameter'));
 }
 
+function alternate_handler(eval_test, if_exp, string_by_line) {
+    if (eval_test === false && if_exp['alternate']['type'] !== 'IfStatement') string_by_line[if_exp['alternate']['loc']['start']['line'] - 2] = '<span style="background-color: #37ff00">' + string_by_line[if_exp['alternate']['loc']['start']['line'] - 2] + '</span>';
+    if (eval_test === false) TraverseForStatements(if_exp['alternate'], string_by_line);
+}
+
 function IfEval(if_exp,string_by_line){
     let test = if_exp['test'];
     let test_string = esco.generate(test);
@@ -56,7 +61,9 @@ function IfEval(if_exp,string_by_line){
     let consequent = if_exp['consequent'];
     TraverseForStatements(consequent,string_by_line);
 
-    if(eval_test === false) TraverseForStatements(if_exp['alternate'],string_by_line);
+    if(if_exp['alternate'] !== null) {
+        alternate_handler(eval_test, if_exp, string_by_line);
+    }
 }
 
 
@@ -70,7 +77,6 @@ function WhileEval(while_exp,string_by_line){
         let while_body = while_exp['body'];
         TraverseForStatements(while_body,string_by_line);
     }
-
 }
 
 /**
@@ -90,12 +96,11 @@ function MakeSubstitution(string,param_table){
 }
 
 function TraverseForStatements(exp,string_by_line){
-    if(exp !== null) {
-        let e_type = exp['type'];
-        if (e_type === 'BlockStatement') exp['body'].map(x => TraverseForStatements(x,string_by_line));
-        else if (e_type === 'IfStatement') IfEval(exp,string_by_line);
-        else if (e_type === 'WhileStatement') WhileEval(exp,string_by_line);
-    }
+    let e_type = exp['type'];
+    if (e_type === 'BlockStatement') exp['body'].map(x => TraverseForStatements(x,string_by_line));
+    else if (e_type === 'IfStatement') IfEval(exp,string_by_line);
+    else if (e_type === 'WhileStatement') WhileEval(exp,string_by_line);
+
 }
 
 /**

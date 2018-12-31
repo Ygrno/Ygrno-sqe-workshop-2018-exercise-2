@@ -319,7 +319,7 @@ function Test25(){
             '}\n';
         let parsedCode = parseCode_line(codeToParse);
         let html_string = EvalStatements(SymbolicSubstitute(parsedCode),'5');
-        assert.equal(html_string,'<pre>function foo(x) {\n' + '<span style="background-color: #ff000e">    if (x == 7) {</span>\n' + '        return x;\n' + '<span style="background-color: #ff000e">    } else if (x == 8) {</span>\n' + '        return x;\n' + '    } else {\n' + '        return x;\n' + '    }\n' + '}\n' + '</pre>');
+        assert.equal(html_string,'<pre>function foo(x) {\n<span style="background-color: #ff000e">    if (x == 7) {</span>\n        return x;\n<span style="background-color: #ff000e">    } else if (x == 8) {</span>\n<span style="background-color: #37ff00">        return x;</span>\n    } else {\n        return x;\n    }\n}\n</pre>');
     });
 }
 
