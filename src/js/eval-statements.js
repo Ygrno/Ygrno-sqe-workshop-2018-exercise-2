@@ -59,7 +59,7 @@ function IfEval(if_exp,string_by_line){
     else string_by_line[if_exp['loc']['start']['line']-1] = '<span style="background-color: #ff000e">' + string_by_line[if_exp['loc']['start']['line']-1] + '</span>';
 
     let consequent = if_exp['consequent'];
-    TraverseForStatements(consequent,string_by_line);
+    if(eval_test) TraverseForStatements(consequent,string_by_line);
 
     if(if_exp['alternate'] !== null) {
         alternate_handler(eval_test, if_exp, string_by_line);
