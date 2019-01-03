@@ -37,10 +37,60 @@ function Clear(){
     ParamTable = [];
 }
 
+function array_handler(input_vector, i, arr) {
+    let string = '[';
+    while (input_vector[i] !== ']' && i < input_vector.length) {
+        i++;
+        string = string + input_vector[i];
+    }
+    arr.push(string);
+    return i;
+}
+
+function regular_input(input_vector, i, arr) {
+    let string = '';
+    while (input_vector[i] !== ',' && i < input_vector.length) {
+        string = string + input_vector[i];
+        i++;
+    }
+    arr.push(string);
+    return i;
+}
+
+function InputSplitter(input_vector){
+    let arr = [];
+    for(let i = 0 ; i < input_vector.length; i++){
+        if(input_vector[i] === '[') {
+            i = array_handler(input_vector, i, arr);
+        }
+        else if(input_vector[i] !== ','){
+            i = regular_input(input_vector, i, arr);
+        }
+    }
+    return arr;
+}
+
+function PushParamArray(parameter,array){
+    let variable = esco.generate(parameter);
+    ParamTable.push(new Variable_table(variable,array,'parameter'));
+    array = array.split('[').join('').split(']').join('');
+    let array_split_by_coma = array.split(',');
+    for(let k = 0; k < array_split_by_coma.length; k++){
+        let element_variable = variable + '[' + k + ']';
+        ParamTable.push(new Variable_table(element_variable,array_split_by_coma[k],'parameter'));
+    }
+    ParamTable.push(new Variable_table(variable + '.length',array_split_by_coma.length,'parameter'));
+}
+
 function CreateParamTable(subbed_func,input_vector){
-    let split_by_comma = input_vector.split(',');
+    let split_input = InputSplitter(input_vector);
+    // let split_by_comma = input_vector.split(',');
     let parameters = subbed_func['params'];
-    for(let j = 0; j<parameters.length; j++) ParamTable.push(new Variable_table(esco.generate(parameters[j]),split_by_comma[j],'parameter'));
+    for(let j = 0; j<parameters.length; j++)
+    {
+        if(split_input[j][0] === '[') PushParamArray(parameters[j],split_input[j]);
+        else ParamTable.push(new Variable_table(esco.generate(parameters[j]),split_input[j],'parameter'));
+    }
 }
 
 function alternate_handler(eval_test, if_exp, string_by_line) {

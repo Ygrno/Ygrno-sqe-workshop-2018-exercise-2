@@ -390,6 +390,23 @@ function Test29(){
     });
 }
 
+function Test30(){
+    it('Test 30', () => {
+        let codeToParse = 'function A(x){\n' + 'let i = 2;\n' + 'let b = x[i];\n' + 'let i = 0;\n' + 'while(i < x.length){\n' + 'if(b > x[i]) {\n' + 'x[i] = x[i] + 1;\n' + 'return x;\n' + '}\n' + 'else x[i] = x[i] - 1;\n' + '}\n' + 'b++;\n' + 'return b + x[1];\n' + '}';
+        let parsedCode = parseCode_line(codeToParse);
+        let html_string = EvalStatements(SymbolicSubstitute(parsedCode),'[1,2,3],true,"string"');
+        assert.equal(html_string,'<pre>function A(x) {\n    while (0 < x.length) {\n<span style="background-color: #37ff00">        if (x[2] > x[0]) {</span>\n            x[0] = x[0] + 1;\n            return x;\n        } else\n            x[0] = x[0] - 1;\n    }\n    return x[2] + 1 + x[1];\n}\n</pre>');
+    });
+}
+
+function Test31(){
+    it('Test 31', () => {
+        let codeToParse = 'function A(x){\n' + 'let a = x[2];\n' + 'x[0]--;\n' + 'x[0]++;\n' + 'a--;\n' + 'a++;\n' + 'return a + x[1];\n' + '}';
+        let parsedCode = parseCode_line(codeToParse);
+        let html_string = EvalStatements(SymbolicSubstitute(parsedCode),'[1,2,3],true,"string"');
+        assert.equal(html_string,'<pre>function A(x) {\n    x[0] = x[0] - 1;\n    x[0] = x[0] + 1;\n    return x[2] - 1 + 1 + x[1];\n}\n</pre>');
+    });
+}
 
 
 
@@ -436,4 +453,6 @@ describe('Colored Html Code', ()=> {
     Test27();
     Test28();
     Test29();
+    Test30();
+    Test31();
 });

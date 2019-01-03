@@ -62,17 +62,71 @@ function CreateSingleExp(exp_string){
     }
 }
 
+/**
+ * @return {*[]}
+ */
+function MemberExpression(exp,env){
+    let string = esco.generate(exp);
+    let to_sub = '';
+    let to_stay = '';
+    let found = false;
+    for(let i = 0; i < string.length ; i++){
+        if(string[i] === '[') found = true;
+        if(found) to_sub = to_sub + string[i];
+        else to_stay = to_stay + string[i];
+    }
+    let subbed = MakeSubstitution(to_sub,env);
+    return [to_stay + subbed,env_getType(to_stay,env)];
+}
+
+function UpdateExpression(exp,env){
+    let argument = exp['argument'],string = '',temp;
+    if(argument['type'] === 'MemberExpression')
+    {
+        temp = MemberExpression(argument,env);
+        string = string + temp[0] + ' = ' + temp[0];
+        let operator = exp['operator'];
+        if(operator === '++') string = string + ' + 1';
+        else string = string + ' - 1';
+    }
+    else
+    {
+        temp = esco.generate(argument);
+        string = string + temp + ' = ' + temp;
+        let operator = exp['operator'];
+        if(operator === '++') string = string + ' + 1';
+        else string = string + ' - 1';
+    }
+    return CreateSingleExp(string);
+}
 
 function ExpressionHandler(exp,env){
+    if(exp['expression']['type'] === 'UpdateExpression') exp['expression'] = UpdateExpression(exp['expression'],env);
     let expression = exp['expression'];
-    // let e_type = expression['type'];
-    // if(e_type === 'AssignmentExpression'){
-    let variable = esco.generate(expression['left']);
+    let left_type = expression['left']['type'];
+    let variable,member = null;
+    if(left_type !== 'MemberExpression') variable = esco.generate(expression['left']);
+    else{
+        member = MemberExpression(expression['left'],env);
+        variable = member[0];
+    }
     let value_string = esco.generate(expression['right']);
-    let value_sub_string = MakeSubstitution(value_string,env);
-    env_setValue(variable,value_sub_string,env,'local');
+    let value_sub_string = MakeSubstitution(value_string, env);
+    if(member === null || member[1] === null) env_setValue(variable, value_sub_string, env, 'local');
+    else
+    {
+        env_setValue(variable, value_sub_string, env, member[1]);
+        exp['expression']['left'] = CreateSingleExp(variable);
+    }
     exp['expression']['right'] = CreateSingleExp(value_sub_string);
-    // }
+}
+
+/**
+ * @return {string}
+ */
+function Parenthesis_handle(value_string,reverse) {
+    if(reverse) return value_string.split(' ( ').join('(').split(' ) ').join(')').split(' [ ').join('[').split(' ] ').join(']');
+    else return value_string.split('(').join(' ( ').split(')').join(' ) ').split('[').join(' [ ').split(']').join(' ] ');
 }
 
 function VD_Subs(vd,env){
@@ -141,7 +195,6 @@ function IfSubs(ifExp,env){
     else if(ifExp['type'] !== 'IfStatement') return GeneralHandler(ifExp,env_clone);
     let test = ifExp['test'];
     let test_string = esco.generate(test);
-    test_string = test_string.split('(').join(' ( ').split(')').join(' ) ');
     let sub_test_string = MakeSubstitution(test_string,env);
     ifExp['test'] = CreateSingleExp(sub_test_string);
     let consequent = ifExp['consequent'];
@@ -187,6 +240,7 @@ function Code_Extractor(program) {
  * @return {string}
  */
 function MakeSubstitution(string,env){
+    string = Parenthesis_handle(string,false);
     let split_by_space = string.split(' ');
     let sub_string = '';
     for(let j = 0; j<split_by_space.length; j++){
@@ -196,6 +250,7 @@ function MakeSubstitution(string,env){
         else sub_string = sub_string + split_by_space[j] + ' ';
     }
     sub_string = sub_string.slice(0,sub_string.length-1);
+    sub_string = Parenthesis_handle(sub_string,true);
     return sub_string;
 }
 
